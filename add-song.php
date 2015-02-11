@@ -2,9 +2,8 @@
 
     require_once __DIR__ . '/vendor/autoload.php';
 
-    // require_once __DIR__ . '/ArtistQuery.php';
-    // require_once __DIR__ . '/GenreQuery.php';
-    // require_once __DIR__ . '/Song.php';
+    $session = new \Symfony\Component\HttpFoundation\Session\Session();
+    $session->start();
 
     $artist_query = new \Itp\ArtistQuery();
     $genre_query = new \Itp\GenreQuery();
@@ -18,6 +17,13 @@
 
         $song = new \Itp\Song($title, $artist_id, $genre_id, $price);
         $song->save();
+
+        $session->getFlashBag()->add('success-message', 'The song' . $song->getTitle());
+        $session->getFlashBag()->add('success-message', ' with an ID of ' . $song->getId());
+        $session->getFlashBag()->add('success-message', ' was inserted succesfully!');
+
+        header('Location: add-song.php');
+        exit;
     }
 ?>
 
@@ -59,12 +65,10 @@
         <input type="submit" value="Add Song">
     </form>
     <br>
-    <?php if (isset($_POST['title']) && isset($_POST['artist']) && isset($_POST['genre']) && isset($_POST['price'])) : ?>
-        <p>
-            The song <?php echo $song->getTitle() ?>
-            with an ID of <?php echo $song->getId() ?>
-            was inserted successfully!
-        </p>
-    <?php endif; ?>
+    <p>
+    <?php foreach($session->getFlashBag()->get('success-message') as $message) : ?>
+            <?php echo $message ?>
+    <?php endforeach; ?>
+    </p>
 </body>
 </html>
